@@ -651,6 +651,18 @@ export async function createTask(projectId: string, draft: TaskDraft, threadId?:
   return data.task;
 }
 
+export async function setTaskdockStatus(task: Task, status: TaskStatus): Promise<Task> {
+  return (await request<{ task: Task }>(`/api/tasks/${encodeURIComponent(task.id)}`, {
+    method: "PATCH", body: JSON.stringify({ version: task.version, status }),
+  })).task;
+}
+
+export async function releaseTaskdockTask(task: Task): Promise<Task> {
+  return (await request<{ task: Task }>(`/api/tasks/${encodeURIComponent(task.id)}/release`, {
+    method: "POST", body: JSON.stringify({ version: task.version }),
+  })).task;
+}
+
 export async function updateTask(task: Task, draft: TaskDraft, threadId?: string): Promise<Task> {
   const data = await request<{ task: Task }>(`/api/tasks/${encodeURIComponent(task.id)}`, {
     method: "PATCH",
