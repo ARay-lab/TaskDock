@@ -190,6 +190,13 @@ export function createTaskDockServer(options = {}) {
       return { projects: db.listProjects().filter((p) => p.id !== "local" || p.issueCount > 0).map(projectInfo) };
     }
     if (name === "get_project_readme") return { readme: db.getProjectReadme(validateProjectId(args.projectId)) };
+    if (name === "save_project_readme") {
+      const projectId = validateProjectId(args.projectId);
+      activeProject(projectId);
+      if (args.version === undefined) throw new ApiError(400, "INVALID_FIELD", "'version' is required; read the current readme with get_project_readme first");
+      const input = parseProjectReadmeSave({ content: args.content, version: args.version });
+      return { readme: db.saveProjectReadme(projectId, input.content, input.version) };
+    }
     if (name === "list_tasks") {
       const filters = { projectId: args.projectId, status: args.status, archived: "false" };
       const tasks = db.listTasks(filters);
@@ -473,7 +480,8 @@ export function createTaskDockServer(options = {}) {
       if (rpc.method === "notifications/initialized") { response.writeHead(202); return response.end(); }
       if (rpc.method === "tools/list") return json(response, 200, { jsonrpc: "2.0", id: rpc.id, result: { tools: [
         ["list_projects", "Read available projects, including archive state, before selecting work. Uses the same identity and visibility as GET /api/projects.", {}, []],
-        ["get_project_readme", "Read a project's shared instructions before acting. Uses the same data as GET /api/projects/:id/readme.", { projectId: { type: "string" } }, ["projectId"]],
+        ["get_project_readme", "Read a project's shared document before acting: project overview, rough plan, and basic conventions. It is the primary entry point for understanding the project. Uses the same data as GET /api/projects/:id/readme.", { projectId: { type: "string" } }, ["projectId"]],
+        ["save_project_readme", "Update a project's shared document (overview, rough plan, basic conventions) that every Agent reads before acting. Read the current readme first and pass its version; on VERSION_CONFLICT re-read and merge both changes. Keep task-specific detail in tasks, comments, and artifacts.", { projectId: { type: "string" }, content: { type: "string" }, version: { type: "integer" } }, ["projectId", "content", "version"]],
         ["get_task_context", "Read complete task context before acting: task with executor/checklist/current claim, project and shared instructions, all comments, activities, artifacts, and attachment metadata. Equivalent to the corresponding REST reads; no history is truncated. Fetch attachment bodies with the existing authenticated /api/attachments/:id/content or /download URLs. User updates do not authorize work; respect waiting instructions and existing ownership.", { taskId: { type: "string" } }, ["taskId"]],
         ["list_tasks", "List tasks in an authorized project. Status values: backlog (待立项, not scheduled), todo (待办, ready to start), in_progress (active execution), in_review (awaiting review/confirmation), done (accepted completion). Current ownership is claimedBy, separate from status; read task history before continuing earlier work.", { projectId: { type: "string" }, status: { type: "string" } }, []],
         ["get_task", "Get a task, executor, checklist results and notes, and current claim. User updates do not start work; act only when instructed. claimedBy is current ownership, not historical execution; an unclaimed in_review or done task may already have outputs. Read get_task_context before acting.", { taskId: { type: "string" } }, ["taskId"]],
