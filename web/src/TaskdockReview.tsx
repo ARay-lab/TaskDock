@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { createComment, getTask, releaseTaskdockTask, setTaskdockStatus } from "./api";
+import { createComment, getTask, releaseTask, setTaskdockStatus } from "./api";
 import type { Task } from "./types";
 
 export function TaskdockReview({ task, onChanged, showActions = false }: {
@@ -29,7 +29,7 @@ export function TaskdockReview({ task, onChanged, showActions = false }: {
         return;
       }
       let current = task;
-      if (action === "return" && current.claimedBy) current = await releaseTaskdockTask(current);
+      if (action === "return" && current.claimedBy) current = await releaseTask(current);
       onChanged(await setTaskdockStatus(current, action === "accept" ? "done" : "todo"));
       setMessage(action === "accept" ? "已确认完成" : "已退回待办，Agent 可重新认领；原成果和修改意见已保留");
     } catch (cause) {
