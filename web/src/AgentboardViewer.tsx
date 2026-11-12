@@ -27,6 +27,7 @@ import { TaskdockSettings } from "./TaskdockSettings";
 import { TaskdockPersonalView, TaskdockWork, readyForUser, taskExecutor } from "./TaskdockWork";
 import { useTaskdockNavigation, type DetailSection, type TaskdockView } from "./taskdockNavigation";
 import { TaskdockDialog } from "./components/TaskdockDialog";
+import { TaskdockReview } from "./TaskdockReview";
 import type { TaskCardPresentation } from "./taskConversations";
 import "./AgentboardViewer.css";
 
@@ -358,8 +359,8 @@ export function AgentboardViewer({ pollIntervalMs = 3000 }: { pollIntervalMs?: n
       {detailSection === "artifacts" && <section><h3>任务成果</h3>{!detail ? <p>加载中…</p> : detail.artifacts.length === 0 ? <p>暂无产出</p> : detail.artifacts.map((artifact) => {
         const href = artifact.attachmentId ? resolveTaskboardUrl(`/api/attachments/${encodeURIComponent(artifact.attachmentId)}/download`) : safeUrl(artifact.url);
         return <article key={artifact.id} className="agentboard-artifact"><div><strong>{artifact.title}</strong><small>{artifact.type} · {artifact.agentName} · {date(artifact.createdAt)}</small></div>{artifact.content && <MarkdownDocument value={artifact.content} />}{href && <a href={href} target="_blank" rel="noopener noreferrer">查看产出 ↗</a>}</article>;
-      })}</section>}
-      {detailSection === "history" && <section><h3>完整操作历史与评论</h3>{!detail ? <p>加载中…</p> : timeline.length === 0 ? <p>暂无记录</p> : timeline.map((item) => <article className="agentboard-event" key={`${item.label}-${item.id}`}><small>{date(item.at)}</small><div><strong>{item.actor}</strong> · {item.label}</div><MarkdownDocument value={item.body} /><TaskdockAttachments attachments={item.attachments} /></article>)}</section>}
+      })}<TaskdockReview key={selectedTask.id} task={selectedTask} onChanged={taskChanged} showActions /></section>}
+      {detailSection === "history" && <section><h3>完整操作历史与评论</h3><TaskdockReview key={selectedTask.id} task={selectedTask} onChanged={taskChanged} />{!detail ? <p>加载中…</p> : timeline.length === 0 ? <p>暂无记录</p> : timeline.map((item) => <article className="agentboard-event" key={`${item.label}-${item.id}`}><small>{date(item.at)}</small><div><strong>{item.actor}</strong> · {item.label}</div><MarkdownDocument value={item.body} /><TaskdockAttachments attachments={item.attachments} /></article>)}</section>}
     </section></TaskdockDialog>}
     {editor && <TaskdockTaskForm task={editor.task} projects={activeProjects} projectId={projectId} onSave={saveTask} onCancel={() => setEditor(null)} />}
   </div></TaskboardLanguageProvider>;

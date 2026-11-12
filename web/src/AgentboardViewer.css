@@ -421,6 +421,16 @@
 .taskdock-detail-tabs button[aria-pressed="true"] { border-color: var(--border-strong); background: var(--surface-active); color: var(--text-primary); }
 .taskdock-detail-tabs button:hover { background: var(--surface-hover); }
 .agentboard-detail .taskdock-detail-tabs + section { border-top: 0; }
+.taskdock-review { display: grid; gap: 12px; margin: 20px 0; padding: 20px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); }
+.taskdock-review h3, .taskdock-review p { margin: 0; }
+.taskdock-review p { color: var(--text-secondary); font-size: 13px; }
+.taskdock-review label { display: grid; gap: 8px; }
+.taskdock-review textarea { width: 100%; min-width: 0; padding: 10px 12px; border: 1px solid var(--border-strong); border-radius: 8px; background: var(--bg); color: var(--text-primary); font: inherit; resize: vertical; }
+.taskdock-review-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.taskdock-review-actions button { min-height: 44px; padding: 8px 14px; border: 1px solid var(--border-strong); border-radius: 7px; background: var(--surface-raised); color: var(--text-primary); }
+.taskdock-review-actions .taskdock-review-accept { margin-left: auto; background: var(--accent); color: #171323; border-color: var(--accent); }
+.taskdock-review-actions button:disabled { opacity: .45; cursor: not-allowed; }
+.taskdock-review :is(button, textarea):focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 @media (max-width: 1050px) {
   .agentboard-app .board-toolbar { align-items: flex-start; }
   .agentboard-app .toolbar-tools { flex-wrap: wrap; }
